@@ -27,7 +27,7 @@ use App\Controller\Api\RegisterController;
         new Get(security: "is_granted('ROLE_ADMIN') or object == user"),     // GET /api/users/{id}
         new Patch(security: "is_granted('ROLE_ADMIN') or object == user"),   // PATCH /api/users/{id}
         new Delete(security: "is_granted('ROLE_ADMIN')"),                    // DELETE /api/users/{id}
-        
+
         // Profile Endpoint
         new Get(
             uriTemplate: '/profile',
@@ -64,7 +64,7 @@ use App\Controller\Api\RegisterController;
                 ]
             ]
         ),
-        
+
     ]
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -98,15 +98,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'user:write'])]
     private ?string $fullName = null;
 
-    /**
-     * @var Collection<int, Booking>
-     */
-    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'user', cascade:['remove'], orphanRemoval: true)]
-    private Collection $bookings;
-
     public function __construct()
     {
-        $this->bookings = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -191,36 +185,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFullName(string $fullName): static
     {
         $this->fullName = $fullName;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Booking>
-     */
-    public function getBookings(): Collection
-    {
-        return $this->bookings;
-    }
-
-    public function addBooking(Booking $booking): static
-    {
-        if (!$this->bookings->contains($booking)) {
-            $this->bookings->add($booking);
-            $booking->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBooking(Booking $booking): static
-    {
-        if ($this->bookings->removeElement($booking)) {
-            // set the owning side to null (unless already changed)
-            if ($booking->getUser() === $this) {
-                $booking->setUser(null);
-            }
-        }
 
         return $this;
     }

@@ -73,7 +73,6 @@ security:
         - { path: ^/api/login$, methods: [POST], roles: PUBLIC_ACCESS }
         # - { path: ^/api/register$, roles: PUBLIC_ACCESS }
         - { path: ^/api/register$, methods: [POST], roles: PUBLIC_ACCESS }
-        - { path: ^/api/aircraft, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api$, roles: PUBLIC_ACCESS }
         - { path: ^/admin/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

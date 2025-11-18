@@ -4,7 +4,6 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    aircraft_upload_dir: '%env(resolve:AIRCRAFT_UPLOAD_DIR)%'
 
 services:
     # default configuration for services in *this* file
@@ -45,17 +44,3 @@ services:
         arguments:
             $decorated: '@App\DataPersister\UserDataPersister.inner'
         
-    app.custom_unique_namer:
-        class: App\Service\Namer\CustomUniqueNamer
-        tags:
-            - { name: vich_uploader.namer }
-
-    app.custom_unique_namer.aircraft_images:
-        parent: app.custom_unique_namer
-        public: true
-    
-    App\State\BookingProcessor:
-        arguments:
-            $decorated: '@api_platform.doctrine.orm.state.persist_processor'
-        tags: ['api_platform.state_processor']
-
