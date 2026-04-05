@@ -33,9 +33,16 @@ class InvoiceSubscriber implements EventSubscriber
             $this->generateInvoiceNumber($entity);
             $this->calculateTotals($entity);
 
-            // recompute invoice changeset
+            // compute invoice changeset
             $meta = $em->getClassMetadata(Invoice::class);
-            $uow->recomputeSingleEntityChangeSet($meta, $entity);
+            $uow->computeChangeSet($meta, $entity);
+
+            // if we incremented the business billing settings counter, ensure its changeset is computed
+            $settings = $entity->getBusiness()?->getBillingSettings();
+            if ($settings) {
+                $settingsMeta = $em->getClassMetadata(get_class($settings));
+                $uow->computeChangeSet($settingsMeta, $settings);
+            }
         }
 
         /** ----------------------------------------------------
@@ -50,7 +57,7 @@ class InvoiceSubscriber implements EventSubscriber
             $this->calculateTotals($entity);
 
             $meta = $em->getClassMetadata(Invoice::class);
-            $uow->recomputeSingleEntityChangeSet($meta, $entity);
+            $uow->computeChangeSet($meta, $entity);
         }
     }
 

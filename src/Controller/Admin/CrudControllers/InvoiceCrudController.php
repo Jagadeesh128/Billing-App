@@ -21,8 +21,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use Symfony\Component\Mime\Email;
 
-
-
 class InvoiceCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -34,19 +32,21 @@ class InvoiceCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         $downloadPdf = Action::new('downloadPdf', 'Download PDF')
-            ->linkToUrl(fn (Invoice $invoice) =>
+            ->linkToUrl(
+                fn (Invoice $invoice) =>
                 $this->generateUrl('invoice_pdf', ['id' => $invoice->getId()])
             )
             ->setIcon('fa fa-file-pdf');
 
         $print = Action::new('printInvoice', 'Print')
-            ->linkToUrl(fn (Invoice $invoice) =>
+            ->linkToUrl(
+                fn (Invoice $invoice) =>
                 $this->generateUrl('invoice_print', ['id' => $invoice->getId()])
             )
             ->setIcon('fa fa-print')
             ->addCssClass('btn btn-secondary')
             ->setHtmlAttributes(['target' => '_blank']);
-        
+
         $mail = Action::new('mailInvoice', 'Send Email')
             ->linkToCrudAction('sendInvoiceEmail')
             ->setIcon('fa fa-envelope');
@@ -114,9 +114,9 @@ class InvoiceCrudController extends AbstractCrudController
             ->allowDelete()
             ->renderExpanded();
 
-        $sub = MoneyField::new('subTotal')->setCurrency('INR')->hideOnForm();
-        $tax = MoneyField::new('taxTotal')->setCurrency('INR')->hideOnForm();
-        $total = MoneyField::new('total')->setCurrency('INR')->hideOnForm();
+        $sub = MoneyField::new('subTotal')->setCurrency('INR')->setStoredAsCents(false)->hideOnForm();
+        $tax = MoneyField::new('taxTotal')->setCurrency('INR')->setStoredAsCents(false)->hideOnForm();
+        $total = MoneyField::new('total')->setCurrency('INR')->setStoredAsCents(false)->hideOnForm();
 
         $status = TextField::new('status');
 
