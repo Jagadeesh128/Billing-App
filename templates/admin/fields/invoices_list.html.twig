@@ -1,0 +1,30 @@
+<h3>Invoices</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Invoice #</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Open</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in field.value %}
+            <tr>
+                <td>{{ invoice.invoiceNumber }}</td>
+                <td>{{ invoice.total }}</td>
+                <td>{{ invoice.status }}</td>
+                <td>{{ invoice.date|date('Y-m-d') }}</td>
+                <td>
+                    <a href="{{ ea_url()
+                        .setController('App\\Controller\\Admin\\CrudControllers\\InvoiceCrudController')
+                        .setAction('detail')
+                        .setEntityId(invoice.id)
+                    }}" class="btn btn-primary btn-sm">Open</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

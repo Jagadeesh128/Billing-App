@@ -26,9 +26,9 @@ final class CustomOpenApiFactory implements OpenApiFactoryInterface
 
         // ℹ️ Update API metadata
         $info = new Info(
-            title: '✈️ Air Charter Booking API',
+            title: '✈️ Billing App API',
             version: '1.0.0',
-            description: 'Flight Booking Back-End',
+            description: 'Billing App Back-End',
             contact: new Contact('Support', 'https://yourcompany.com', 'support@yourcompany.com'),
             license: new License('MIT', 'https://opensource.org/licenses/MIT')
         );

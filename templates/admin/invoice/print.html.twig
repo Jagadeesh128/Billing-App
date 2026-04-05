@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice.invoiceNumber }}</title>
+
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; }
+        .header { display: flex; justify-content: space-between; }
+        .title { font-size: 26px; font-weight: bold; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 14px;
+        }
+        th { background: #f7f7f7; }
+        .right { text-align: right; }
+        .summary td { border: none; }
+    </style>
+
+    <script>
+        window.onload = function () {
+            window.print();
+        };
+    </script>
+</head>
+
+<body>
+
+    <div class="header">
+        <div>
+            <h2>{{ invoice.business.name }}</h2>
+            GSTIN: {{ invoice.business.gstin }}<br>
+            State: {{ invoice.business.state }}<br>
+            Address: {{ invoice.business.address }}
+        </div>
+
+        <div style="text-align:right;">
+            <h2>INVOICE</h2>
+            <strong>No:</strong> {{ invoice.invoiceNumber }}<br>
+            <strong>Date:</strong> {{ invoice.date|date('d-m-Y') }}<br>
+        </div>
+    </div>
+
+    <hr>
+
+    <h3>Bill To</h3>
+    <p>
+        {{ invoice.customerName }}<br>
+        {{ invoice.customerPhone }}<br>
+        {{ invoice.customerAddress }}
+    </p>
+
+    <h3>Items</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th class="right">Qty</th>
+                <th class="right">Unit Price</th>
+                <th class="right">Tax Rate</th>
+                <th class="right">Line Total</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in invoice.items %}
+                <tr>
+                    <td>{{ item.description }}</td>
+                    <td class="right">{{ item.quantity }}</td>
+                    <td class="right">{{ item.unitPrice }}</td>
+                    <td class="right">{{ item.taxRate }}%</td>
+                    <td class="right">{{ item.lineTotal }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="summary" style="margin-top: 30px;">
+        <tr>
+            <td style="width:70%;"></td>
+            <td class="right"><strong>Subtotal:</strong></td>
+            <td class="right">{{ invoice.subTotal }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="right"><strong>Tax:</strong></td>
+            <td class="right">{{ invoice.taxTotal }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="right"><strong>Total:</strong></td>
+            <td class="right"><strong>{{ invoice.total }}</strong></td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <p style="font-size:12px; color:#888;">
+        This is a computer generated invoice.
+    </p>
+
+</body>
+</html>

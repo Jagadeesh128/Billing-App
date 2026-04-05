@@ -1,0 +1,30 @@
+<h3>Items</h3>
+
+{% if field.value is iterable %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Tax Rate</th>
+            <th>Line Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in field.value %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.taxRate ?? 0 }}%</td>
+                <td>
+                    {{ (item.quantity * item.price)|number_format(2) }}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No items</p>
+{% endif %}

@@ -1,0 +1,178 @@
+{# {% set invoice = field.value %}
+{% set business = invoice.business %}
+{% set items = invoice.items %} #}
+
+{# Universal invoice resolver #}
+
+{% if invoice is not defined %}
+    {% if ea is defined %}
+        {% set invoice = ea.entity.instance ?? null %}
+    {% elseif field is defined %}
+        {% set invoice = field.value ?? null %}
+    {% endif %}
+{% endif %}
+
+{# If still missing: show error but DO NOT return (Twig does not support return) #}
+{% if invoice is null %}
+    <div style="padding:20px; background:#ffecec; border:1px solid #ff8888; color:#a00;">
+        ❌ <strong>Error:</strong> Invoice object missing (template called outside EA without invoice variable).
+    </div>
+
+    {# STOP rendering further content by wrapping whole template in IF #}
+{% endif %}
+
+{% if invoice %}
+    {% set business = invoice.business %}
+    {% set items = invoice.items %}
+{% endif %}
+
+
+<style>
+    .gst-invoice-box {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        line-height: 20px;
+        color: #333;
+        padding: 20px;
+        border: 2px solid #000;
+        background: #fff;
+        margin-bottom: 20px;
+    }
+    .gst-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    .gst-table th, .gst-table td {
+        border: 1px solid #555;
+        padding: 6px 8px;
+    }
+    .gst-header {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        padding-bottom: 10px;
+    }
+    .gst-section-title {
+        background: #f4f4f4;
+        font-weight: bold;
+        padding: 6px;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+    }
+</style>
+
+<div class="gst-invoice-box">
+
+    <div class="gst-header">
+        TAX INVOICE
+    </div>
+
+    <table class="gst-table">
+        <tr>
+            <td width="50%">
+                <strong>{{ business.name }}</strong><br>
+                GSTIN: {{ business.gstin | upper}}<br>
+                State: {{ business.state }}<br>
+                Address: {{ business.address }}
+            </td>
+            <td width="50%">
+                <strong>Invoice No:</strong> {{ invoice.invoiceNumber }}<br>
+                <strong>Date:</strong> {{ invoice.date|date('d-m-Y') }}<br>
+                <strong>Status:</strong> {{ invoice.status }}
+            </td>
+        </tr>
+    </table>
+
+    <div class="gst-section-title">Bill To</div>
+
+    <table class="gst-table">
+        <tr>
+            <td>
+                Customer Name: {{ invoice.customerName }}<br>
+                Customer Phone Number:{{ invoice.customerPhone }}<br>
+                Customer Address: {{ invoice.customerAddress }}
+            </td>
+        </tr>
+    </table>
+
+    <div class="gst-section-title">Item Details</div>
+
+    <table class="gst-table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Description</th>
+            <th>HSN/SAC</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Tax %</th>
+            <th>Line Total</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.hsnSac ?: '-' }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unitPrice }}</td>
+            <td>{{ item.taxRate }}</td>
+            {# <td>{{ item.lineTotal }}</td> #}
+            <td>{{ item.lineTotal + (item.lineTotal * (item.taxRate / 100)) }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="gst-section-title">Tax Summary</div>
+
+    <table class="gst-table">
+        <tr>
+            <th>Subtotal</th>
+            <td>{{ invoice.subTotal }}</td>
+        </tr>
+
+        {% if invoice.isSameStateCustomer %}
+            {# CGST + SGST #}
+            {% set totalRate = (items|first).taxRate ?? 0 %}
+            <tr>
+                <th>CGST ({{ totalRate / 2 }}%)</th>
+                <td>{{ invoice.taxTotal / 2 }}</td>
+            </tr>
+            <tr>
+                <th>SGST ({{ totalRate / 2 }}%)</th>
+                <td>{{ invoice.taxTotal / 2 }}</td>
+            </tr>
+        {% else %}
+            {# IGST #}
+            {% set totalRate = (items|first).taxRate ?? 0 %}
+            <tr>
+                <th>IGST ({{ totalRate }}%)</th>
+                <td>{{ invoice.taxTotal }}</td>
+            </tr>
+        {% endif %}
+
+        <tr>
+            <th>Tax Total</th>
+            <td>{{ invoice.taxTotal }}</td>
+        </tr>
+
+        <tr>
+            <th><strong>Grand Total</strong></th>
+            <td><strong>{{ invoice.total }}</strong></td>
+        </tr>
+    </table>
+
+    <div class="gst-section-title">Terms</div>
+    <p>{{ business.billingSettings.terms ?: 'Thank you for your business!' }}</p>
+
+</div>
+
+{% if app.request.attributes.get('_route') == 'invoice_print' %}
+<script>
+    window.onload = function () { window.print(); };
+</script>
+{% endif %}

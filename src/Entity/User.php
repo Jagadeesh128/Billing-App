@@ -98,9 +98,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'user:write'])]
     private ?string $fullName = null;
 
+    /**
+     * @var Collection<int, Business>
+     */
+    #[ORM\OneToMany(targetEntity: Business::class, mappedBy: 'owner')]
+    private Collection $businesses;
+
     public function __construct()
     {
-
+        $this->businesses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -192,6 +198,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString(): string
     {
         return $this->getEmail(); // or getFullName(), or any unique user identifier
+    }
+
+    /**
+     * @return Collection<int, Business>
+     */
+    public function getBusinesses(): Collection
+    {
+        return $this->businesses;
+    }
+
+    public function addBusiness(Business $business): static
+    {
+        if (!$this->businesses->contains($business)) {
+            $this->businesses->add($business);
+            $business->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBusiness(Business $business): static
+    {
+        if ($this->businesses->removeElement($business)) {
+            // set the owning side to null (unless already changed)
+            if ($business->getOwner() === $this) {
+                $business->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 
 }

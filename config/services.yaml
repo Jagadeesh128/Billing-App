@@ -43,4 +43,8 @@ services:
         decorates: 'api_platform.doctrine.orm.state.persist_processor'
         arguments:
             $decorated: '@App\DataPersister\UserDataPersister.inner'
-        
+    
+    App\EventSubscriber\InvoiceSubscriber:
+        tags:
+            - { name: doctrine.event_subscriber }
+
