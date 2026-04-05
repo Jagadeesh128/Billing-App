@@ -34,9 +34,11 @@ Project: a Symfony-based billing application that manages businesses, invoices, 
 
 ---
 
-## Quick Start (Docker - recommended)
+## Quick Start (Local development)
 
-Prerequisites: Docker and Docker Compose.
+This repository no longer includes Docker automation. Follow the steps below to run the project locally.
+
+Prereqs: PHP 8.1 or 8.2, Composer, a running MySQL or PostgreSQL instance, and optionally Apache.
 
 1. Clone the repository and enter it:
 
@@ -45,50 +47,34 @@ git clone <your-repo-url> billing-app
 cd billing-app
 ```
 
-2. Build and start services:
+2. Copy environment file and update database connection in `.env.local`:
 
 ```bash
-docker compose up --build -d
+cp .env .env.local
+# Edit DATABASE_URL in .env.local, for example:
+# DATABASE_URL="mysql://db_user:db_pass@127.0.0.1:3306/billing_db"
 ```
 
-3. Enter the app container (if needed) and run migrations:
-
-```bash
-docker compose exec app bash
-composer install
-php bin/console doctrine:migrations:migrate --no-interaction
-php bin/console doctrine:fixtures:load --no-interaction # optional
-```
-
-4. Open the app in your browser (port may vary):
-
-- Admin / EasyAdmin: http://localhost:8000/admin (or configured host)
-- API docs: check `/api` or `/docs` depending on API Platform setup
-
-5. Stop services:
-
-```bash
-docker compose down
-```
-
----
-
-## Local (non-Docker) setup
-
-Prereqs: PHP 8.1/8.2+, Composer, MySQL/Postgres, Apache or built-in server.
-
-1. Copy `.env` to `.env.local` and update `DATABASE_URL`.
-
-2. Install dependencies and create the database:
+3. Install PHP dependencies:
 
 ```bash
 composer install
+```
+
+4. Create the database and run migrations:
+
+```bash
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
-php bin/console doctrine:fixtures:load # optional
 ```
 
-3. Run the server locally:
+5. (Optional) Load fixtures/sample data:
+
+```bash
+php bin/console doctrine:fixtures:load
+```
+
+6. Run the built-in Symfony server or use your Apache virtual host:
 
 ```bash
 symfony server:start
@@ -96,6 +82,12 @@ symfony server:start
 php -S 127.0.0.1:8000 -t public
 ```
 
+7. Open the app in your browser:
+
+- Admin / EasyAdmin: http://localhost:8000/admin
+- API docs: http://localhost:8000/docs (if API Platform is enabled)
+
+---
 ---
 
 ## Useful Commands
@@ -123,5 +115,5 @@ Contributions are welcome. Open issues or PRs on the repository. Follow the exis
 
 ## Authors
 
-- Jagadeesh128 (original)
+- Jagadeesh
 
